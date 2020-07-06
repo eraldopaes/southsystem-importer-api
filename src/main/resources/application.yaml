@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/southsystem?useSSL=false
+    username: root
+    password: 1123581618
+    type: com.zaxxer.hikari.HikariDataSource
+  rabbitmq:
+    addresses: localhost:5672
+    username: guest
+    password: guest
+
+southsystem:
+  s3:
+    bucket-name: southsystem
+    base-url: https://s3.amazonaws.com/
+    access-key: ${S3_ACCESS_KEY}
+    secret-key: ${S3_SECRET_KEY}
+  cloud-front:
+    base-url: https://d1kbrmd01kkpjd.cloudfront.net
+
+server:
+  port: 9000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

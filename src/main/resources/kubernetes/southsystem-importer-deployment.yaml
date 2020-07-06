@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: southsystem-importer-deployment
+  annotations:
+    linkerd.io/skip-outbound-ports: "25060,25061"
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 25%
+  selector:
+    matchLabels:
+      component: southsystem-importer
+  template:
+    metadata:
+      labels:
+        component: southsystem-importer
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: southsystem-importer
+          image: blipe/southsystem-importer:v1
+          ports:
+            - containerPort: 9000
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "qa"
+            - name: DATA_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: southsystem-config-map
+                  key: spring.datasource.url
+            - name: DATA_BASE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: southsystem-config-map
+                  key: spring.datasource.username
+            - name: DATA_BASE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: southsystem-config-map
+                  key: spring.datasource.password
+            - name: RABBIT_ADDRESSES
+              valueFrom:
+                configMapKeyRef:
+                  name: southsystem-config-map
+                  key: spring.rabbitmq.addresses
+            - name: RABBIT_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: southsystem-config-map
+                  key: spring.rabbitmq.username
+            - name: RABBIT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: southsystem-config-map
+                  key: spring.rabbitmq.password
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: southsystem-config-map
+                  key: southsystem.s3.access-key
+            - name: S3_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: southsystem-config-map
+                  key: southsystem.s3.secret-key
+          resources:
+            limits:
+              memory: "256Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9000
+            initialDelaySeconds: 45
+            periodSeconds: 5
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9000
+            initialDelaySeconds: 60
+            timeoutSeconds: 10
+            periodSeconds: 3
+            failureThreshold: 10
