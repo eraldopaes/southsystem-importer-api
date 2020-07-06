@@ -1,0 +1,92 @@
+{
+	"info": {
+		"_postman_id": "e7174600-9e10-4f49-9c55-ae80c1d2c6ad",
+		"name": "southsystem",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "importar aquivo",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "attachment",
+							"type": "file",
+							"src": "/Users/eraldopaesbarreto/data/in/test1.dat"
+						}
+					]
+				},
+				"url": {
+					"raw": "qa.api.blipe.app/southsystem/api/v1/file-imports",
+					"host": [
+						"qa",
+						"api",
+						"blipe",
+						"app"
+					],
+					"path": [
+						"southsystem",
+						"api",
+						"v1",
+						"file-imports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "verificar situacao arquivo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "qa.api.blipe.app/southsystem/api/v1/file-imports/4",
+					"host": [
+						"qa",
+						"api",
+						"blipe",
+						"app"
+					],
+					"path": [
+						"southsystem",
+						"api",
+						"v1",
+						"file-imports",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "obter url download arquivo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "qa.api.blipe.app/southsystem/api/v1/file-imports/4/resume",
+					"host": [
+						"qa",
+						"api",
+						"blipe",
+						"app"
+					],
+					"path": [
+						"southsystem",
+						"api",
+						"v1",
+						"file-imports",
+						"4",
+						"resume"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
