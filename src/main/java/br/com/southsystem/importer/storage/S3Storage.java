@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.UUID;
 
+import static br.com.southsystem.importer.utils.Constants.*;
+
 @Component
 public class S3Storage implements Storage {
 
@@ -75,11 +77,11 @@ public class S3Storage implements Storage {
 
         switch (bucketTypeEnum) {
             case FILE_INPUT:
-                path = "file-input/" + newName;
+                path = BucketTypeEnum.FILE_INPUT.getName() + "/" + newName;
                 LOGGER.info("Path para imagem: " + path);
                 break;
             case FILE_OUTPUT:
-                path = "file-output/" + newName;
+                path = BucketTypeEnum.FILE_OUTPUT.getName() + "/" + newName;
                 LOGGER.info("Path para imagem: " + path);
                 break;
             default:
@@ -104,7 +106,7 @@ public class S3Storage implements Storage {
     }
 
     private String renameToProcessedFilename(String filename) {
-        String filenameWithoutExtension = filename.replace(".dat", "");
-        return filenameWithoutExtension + ".done.dat";
+        String filenameWithoutExtension = filename.replace(DAT_EXTENSION, "");
+        return filenameWithoutExtension + DONE_EXTENSION;
     }
 }
