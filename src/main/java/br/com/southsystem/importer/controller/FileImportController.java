@@ -34,6 +34,7 @@ public class FileImportController {
     @PostMapping(value = "/file-imports")
     public ResponseEntity<FileImport> upload(@RequestParam("attachment") MultipartFile attachment) {
         FileImport uploaded = fileImportService.upload(attachment);
+        fileImportService.sendToProcess(uploaded);
         return ResponseEntity.ok(uploaded);
     }
 }

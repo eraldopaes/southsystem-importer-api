@@ -63,12 +63,8 @@ public class FileImportService {
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public FileImport upload(MultipartFile multipartFile) {
-
         validateFile(multipartFile);
-        FileImport fileImport = save(multipartFile);
-        sendToProcess(fileImport);
-
-        return fileImport;
+        return save(multipartFile);
     }
 
     private void validateFile(MultipartFile multipartFile) {
@@ -105,7 +101,7 @@ public class FileImportService {
         return fileImportSaved;
     }
 
-    private void sendToProcess(FileImport fileImport) {
+    public void sendToProcess(FileImport fileImport) {
         FileImportDTO fileImportDTO = new FileImportDTO();
         fileImportDTO.setId(fileImport.getId());
         rabbitTemplate.convertAndSend(FILE_IMPORT_EXCHANGE, FILE_IMPORT_BINDING, fileImportDTO);

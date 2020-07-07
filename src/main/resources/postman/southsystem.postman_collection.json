@@ -16,12 +16,13 @@
 						{
 							"key": "attachment",
 							"type": "file",
-							"src": "/Users/eraldopaesbarreto/data/in/test1.dat"
+							"src": "/Users/eraldopaesbarreto/data/test3.dat"
 						}
 					]
 				},
 				"url": {
-					"raw": "qa.api.blipe.app/southsystem/api/v1/file-imports",
+					"raw": "https://qa.api.blipe.app/southsystem/api/v1/file-imports",
+					"protocol": "https",
 					"host": [
 						"qa",
 						"api",
@@ -44,7 +45,8 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "qa.api.blipe.app/southsystem/api/v1/file-imports/4",
+					"raw": "https://qa.api.blipe.app/southsystem/api/v1/file-imports/124",
+					"protocol": "https",
 					"host": [
 						"qa",
 						"api",
@@ -56,7 +58,7 @@
 						"api",
 						"v1",
 						"file-imports",
-						"4"
+						"124"
 					]
 				}
 			},
@@ -68,7 +70,8 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "qa.api.blipe.app/southsystem/api/v1/file-imports/4/resume",
+					"raw": "https://qa.api.blipe.app/southsystem/api/v1/file-imports/112/resume",
+					"protocol": "https",
 					"host": [
 						"qa",
 						"api",
@@ -80,7 +83,7 @@
 						"api",
 						"v1",
 						"file-imports",
-						"4",
+						"112",
 						"resume"
 					]
 				}
