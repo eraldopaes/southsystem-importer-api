@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/southsystem/api/v1")
 public class FileImportController {
@@ -32,9 +34,9 @@ public class FileImportController {
     }
 
     @PostMapping(value = "/file-imports")
-    public ResponseEntity<FileImport> upload(@RequestParam("attachment") MultipartFile attachment) {
-        FileImport uploaded = fileImportService.upload(attachment);
-        fileImportService.sendToProcess(uploaded);
-        return ResponseEntity.ok(uploaded);
+    public ResponseEntity<List<FileImport>> upload(@RequestParam("attachment") MultipartFile[] attachment) {
+        List<FileImport> uploadedFiles = fileImportService.upload(attachment);
+        fileImportService.sendToProcess(uploadedFiles);
+        return ResponseEntity.ok(uploadedFiles);
     }
 }

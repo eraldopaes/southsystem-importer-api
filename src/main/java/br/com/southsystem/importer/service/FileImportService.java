@@ -20,6 +20,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import static br.com.southsystem.importer.config.broker.RabbitMQConfig.*;
 import static java.util.Objects.isNull;
 
@@ -62,48 +68,56 @@ public class FileImportService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public FileImport upload(MultipartFile multipartFile) {
-        validateFile(multipartFile);
-        return save(multipartFile);
+    public List<FileImport> upload(MultipartFile[] multipartFile) {
+        List<MultipartFile> files = validateFile(multipartFile);
+        return save(files);
     }
 
-    private void validateFile(MultipartFile multipartFile) {
-        if (isNull(multipartFile)) {
+    private List<MultipartFile> validateFile(MultipartFile[] files) {
+        if (isNull(files)) {
             LOGGER.error("Arquivo inválido");
             throw new BusinessException("file-import-service.invalid-file");
         }
 
-        if (!getExtension(multipartFile.getOriginalFilename()).equals("dat")) {
-            LOGGER.error("Arquivo inválido");
-            throw new BusinessException("file-import-service.invalid-file");
-        }
+        return Arrays.stream(files)
+                .filter(file -> Objects.equals(getExtension(file.getOriginalFilename()), "dat"))
+                .collect(Collectors.toList());
     }
 
     private String getExtension(String filename) {
         return Files.getFileExtension(filename);
     }
 
-    private FileImport save(MultipartFile multipartFile) {
+    private List<FileImport> save(List<MultipartFile> files) {
 
-        String fileSaved = storage.save(multipartFile, BucketTypeEnum.FILE_INPUT);
+        final List<FileImport> savedFiles = new ArrayList<>();
 
-        FileImport fileImport = new FileImport();
-        fileImport.setFilename(fileSaved);
-        fileImport.setStatus(FileImportStatusEnum.WAITING_FOR_PROCESS);
-        FileImport fileImportSaved = fileImportRepository.save(fileImport);
+        files.forEach(file -> {
+            String fileSaved = storage.save(file, BucketTypeEnum.FILE_INPUT);
 
-        FileImportHistory fileImportHistory = new FileImportHistory();
-        fileImportHistory.setFileImport(fileImportSaved);
-        fileImportHistory.setStatus(FileImportStatusEnum.WAITING_FOR_PROCESS);
-        fileImportHistory.setDate(localDateTimeUtils.getLocalDateTime());
-        fileImportHistoryService.save(fileImportHistory);
+            FileImport fileImport = new FileImport();
+            fileImport.setFilename(fileSaved);
+            fileImport.setStatus(FileImportStatusEnum.WAITING_FOR_PROCESS);
+            FileImport fileImportSaved = fileImportRepository.save(fileImport);
 
-        return fileImportSaved;
+            FileImportHistory fileImportHistory = new FileImportHistory();
+            fileImportHistory.setFileImport(fileImportSaved);
+            fileImportHistory.setStatus(FileImportStatusEnum.WAITING_FOR_PROCESS);
+            fileImportHistory.setDate(localDateTimeUtils.getLocalDateTime());
+            fileImportHistoryService.save(fileImportHistory);
+
+            savedFiles.add(fileImportSaved);
+        });
+
+        return savedFiles;
     }
 
-    public void sendToProcess(FileImport fileImport) {
-        FileImportDTO fileImportDTO = new FileImportDTO();
-        fileImportDTO.setId(fileImport.getId());
-        rabbitTemplate.convertAndSend(FILE_IMPORT_EXCHANGE, FILE_IMPORT_BINDING, fileImportDTO);
+    public void sendToProcess(List<FileImport> fileImports) {
+        fileImports.forEach(fileImport -> {
+            FileImportDTO fileImportDTO = new FileImportDTO();
+            fileImportDTO.setId(fileImport.getId());
+            rabbitTemplate.convertAndSend(FILE_IMPORT_EXCHANGE, FILE_IMPORT_BINDING, fileImportDTO);
+            LOGGER.info("Arquivo {}, com ID{} enviado para processamento", fileImport.getFilename(), fileImport.getId());
+        });
     }
 }

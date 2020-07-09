@@ -24,4 +24,7 @@ public class FileImport {
 
     @Column(name = "file_import_error")
     private String error;
+
+    @Column(name = "file_import_error_line")
+    private String errorLine;
 }
